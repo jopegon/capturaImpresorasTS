@@ -3,6 +3,7 @@ import * as snmp from "net-snmp";
 import type { IOidsIniciales } from "./clases/IOidsIniciales.js";
 import { ConstructorOids } from "./clases/ConstructorOids.js";
 
+export type ValorContador = number | string | undefined;
 
 export abstract class AbstractConsultaImpresora {
 
@@ -57,7 +58,7 @@ export abstract class AbstractConsultaImpresora {
      * Es necesario conocer el modelo antes de generar los OID
      * específicos de cada fabricante/modelo.
      */
-    protected async getModelo(): Promise<String> {
+    protected async getModelo(): Promise<string> {
 
         const session = snmp.createSession(
             this.impresora.ip,
@@ -126,13 +127,13 @@ export abstract class AbstractConsultaImpresora {
         const valor: number | string | undefined = resultados.get(this.oids.oidContadorImpresiones);
 
         // Validamos que el valor exista y que sea estrictamente de tipo 'number'
-        if (typeof valor === 'number' && !isNaN(valor)) {
+        if (typeof valor === 'number' && !Number.isNaN(valor)) {
             this.impresora.contador = valor;
         }
     }
 
-    protected calcularPorcentaje(capacidadRaw: string | number | undefined,
-        nivelRaw: string | number | undefined): number | undefined {
+    protected calcularPorcentaje(capacidadRaw: ValorContador,
+        nivelRaw: ValorContador): number | undefined {
 
         if (capacidadRaw === undefined || nivelRaw === undefined) {
             return undefined;
