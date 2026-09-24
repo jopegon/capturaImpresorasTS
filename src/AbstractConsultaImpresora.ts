@@ -2,7 +2,8 @@ import type { Impresora } from "./clases/Impresora.js";
 import * as snmp from "net-snmp";
 import type { IOidsIniciales } from "./clases/IOidsIniciales.js";
 import { ConstructorOids } from "./clases/ConstructorOids.js";
-import { ClientOptions } from "./clases/ClientOptions.js";
+import type { IClientOptions } from "./clases/ClientOptions/IClientOptions.js";
+import { ConstructorClientOptions } from "./clases/ClientOptions/ConstructorClientOptions.js";
 
 export type ValorContador = number | string | undefined;
 
@@ -12,12 +13,14 @@ export abstract class AbstractConsultaImpresora {
 
     protected oids: IOidsIniciales;
 
-    protected clientOptions: ClientOptions;
+    protected clientOptions: IClientOptions;
 
 
     constructor(impresora: Impresora) {
         this.impresora = impresora;
-        this.clientOptions = new ClientOptions();
+
+        // Por defecto carga la conf para version2c
+        this.clientOptions = new ConstructorClientOptions().clientOptions();
 
         // Inicialmente desconocemos el modelo de impresora.
         // Estos OID permiten realizar la identificación inicial.
@@ -59,8 +62,8 @@ export abstract class AbstractConsultaImpresora {
 
         const session = snmp.createSession(
             this.impresora.ip,
-            this.clientOptions.getClientOptionsCommunity(),
-            this.clientOptions.getClientOptions()
+            this.clientOptions.community,
+            this.clientOptions
         );
 
         try {
@@ -104,8 +107,8 @@ export abstract class AbstractConsultaImpresora {
      
         const session = snmp.createSession(
             this.impresora.ip,
-            this.clientOptions.getClientOptionsCommunity(),
-            this.clientOptions.getClientOptions()
+            this.clientOptions.community,
+            this.clientOptions.options
         );
   
         try {
