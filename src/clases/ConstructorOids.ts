@@ -51,12 +51,14 @@ export class ConstructorOids {
      */
     OidsInicialesDe(modelo?: string): OidIniciales {
 
+        
         // Para el caso en el que no se proporciona ningún parámetro
         if (!modelo) {
             return new OidIniciales();
         }
 
         // Si no encuentra el modelo, devuelve la configuración genérica
+        console.log(` el modelo es  ${this.MapaObjetos.get(modelo)?.oidTonerLevelCyan}`)
         return this.MapaObjetos.get(modelo) ?? new OidIniciales();
     }
 

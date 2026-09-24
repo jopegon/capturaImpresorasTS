@@ -2,6 +2,7 @@ import type { Impresora } from "./clases/Impresora.js";
 import * as snmp from "net-snmp";
 import type { IOidsIniciales } from "./clases/IOidsIniciales.js";
 import { ConstructorOids } from "./clases/ConstructorOids.js";
+import { ClientOptions } from "./clases/ClientOptions.js";
 
 export type ValorContador = number | string | undefined;
 
@@ -11,16 +12,12 @@ export abstract class AbstractConsultaImpresora {
 
     protected oids: IOidsIniciales;
 
-    protected readonly clientOptions = {
-        port: 161,
-        retries: 3,
-        timeout: 250,
-        version: snmp.Version2c,
-        community: "public"
-    };
+    protected clientOptions: ClientOptions;
+
 
     constructor(impresora: Impresora) {
         this.impresora = impresora;
+        this.clientOptions = new ClientOptions();
 
         // Inicialmente desconocemos el modelo de impresora.
         // Estos OID permiten realizar la identificación inicial.
@@ -62,8 +59,8 @@ export abstract class AbstractConsultaImpresora {
 
         const session = snmp.createSession(
             this.impresora.ip,
-            this.clientOptions.community,
-            this.clientOptions
+            this.clientOptions.getClientOptionsCommunity(),
+            this.clientOptions.getClientOptions()
         );
 
         try {
@@ -91,7 +88,7 @@ export abstract class AbstractConsultaImpresora {
     }
 
     protected setNumeroSerie(resultados: Map<string, string | number>) {
-       
+
         this.impresora.numeroDeSerie = resultados.get(this.oids.oidNumeroDeSerie)?.toString() ?? '';
 
     }
@@ -104,16 +101,16 @@ export abstract class AbstractConsultaImpresora {
      */
     async getNiveles(listaOids: string[]): Promise<snmp.Varbind[]> {
 
+     
         const session = snmp.createSession(
             this.impresora.ip,
-            this.clientOptions.community,
-            this.clientOptions
+            this.clientOptions.getClientOptionsCommunity(),
+            this.clientOptions.getClientOptions()
         );
-
+  
         try {
 
             const varbinds: snmp.Varbind[] = await this.snmpGet(session, listaOids);
-
             return varbinds;
 
         } finally {
@@ -134,7 +131,6 @@ export abstract class AbstractConsultaImpresora {
 
     protected calcularPorcentaje(capacidadRaw: ValorContador,
         nivelRaw: ValorContador): number | undefined {
-
         if (capacidadRaw === undefined || nivelRaw === undefined) {
             return undefined;
         }
@@ -170,6 +166,47 @@ export abstract class AbstractConsultaImpresora {
     }
 
 
+    protected setNivelAmarillo(resultados: Map<string, string | number>) {
+        const porcentaje = this.calcularPorcentaje(
+            resultados.get(this.oids.oidFullCapacityAmarillo),
+            resultados.get(this.oids.oidTonerLevelAmarillo)
+        );
+
+        if (porcentaje === undefined) {
+            return;
+        }
+
+        this.impresora.amarillo = porcentaje;
+    }
+
+
+    protected setNivelCyan(resultados: Map<string, string | number>) {
+        const porcentaje = this.calcularPorcentaje(
+            resultados.get(this.oids.oidFullCapacityCyan),
+            resultados.get(this.oids.oidTonerLevelCyan)
+        );
+
+        if (porcentaje === undefined) {
+            return;
+        }
+
+        this.impresora.cyan = porcentaje;
+    }    
+
+
+    protected setNivelMagenta(resultados: Map<string, string | number>) {
+        const porcentaje = this.calcularPorcentaje(
+            resultados.get(this.oids.oidFullCapacityMagenta),
+            resultados.get(this.oids.oidTonerLevelMagenta)
+        );
+
+        if (porcentaje === undefined) {
+            return;
+        }
+
+        this.impresora.magenta = porcentaje;
+    }    
+
 
 
 
@@ -203,9 +240,16 @@ export abstract class AbstractConsultaImpresora {
         this.setContadorPaginas(mapVarbinds);
 
         this.setNivelNegro(mapVarbinds);
-        
 
+        this.setNivelAmarillo(mapVarbinds);
 
+        this.setNivelCyan(mapVarbinds);
+
+        this.setNivelMagenta(mapVarbinds);
+
+        if (this.impresora.magenta !== undefined){
+            this.impresora.color=true;
+        }
 
         return this.impresora;
     }
