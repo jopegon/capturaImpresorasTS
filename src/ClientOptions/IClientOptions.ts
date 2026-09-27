@@ -11,7 +11,7 @@ export abstract class IClientOptions {
     }
 
 
-    private _community:string= "public";
+    private readonly _community:string= "public";
 
 
     // --- Puerto ---
