@@ -3,7 +3,7 @@ import { ConstructorConsultaImpresora } from "./Impresoras/ConstructorConsultaIm
 import { Impresora } from "./Impresoras/Impresora.js";
 
 
-let impresora:Impresora = new Impresora('10.41.81.239', 'Policía Judicial, Pasillo (secretaría)');
+let impresora:Impresora = new Impresora('192.168.1.142', 'Policía Judicial, Pasillo (secretaría)');
 
 let consulta:AbstractConsultaImpresora = new ConstructorConsultaImpresora().construyeConsultaImpresora(impresora);
 

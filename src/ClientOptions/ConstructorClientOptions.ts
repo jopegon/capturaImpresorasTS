@@ -2,17 +2,21 @@ import { ClientOptionsVersion1 } from "./ClientOptionsVersion1.js";
 import { ClientOptionsVersion2c } from "./ClientOptionsVersion2c.js";
 import type { IClientOptions } from "./IClientOptions.js";
 
-export class ConstructorClientOptions {
 
-    /*
-    Esta clase se encarga de obtener el objeto de datos iniciales
-    con las particularidades de cada modelo de impresora
-    */
-
-    MapaObjetos = new Map<string, IClientOptions>([
+const mapaObjetos = new Map<string, IClientOptions>([
         ["B430", new ClientOptionsVersion1()],
         ["EPSON AL-M4000", new ClientOptionsVersion1()],
     ]);
+
+
+export class ConstructorClientOptions {
+
+    /*
+    Esta clase se encarga de obtener el objeto de opciones 
+    con las particularidades de cada modelo de impresora
+    */
+
+
     clientOptions(modelo?: string): IClientOptions {
 
 
@@ -21,7 +25,7 @@ export class ConstructorClientOptions {
             return new ClientOptionsVersion2c();
         }
 
-        return this.MapaObjetos.get(modelo) ?? new ClientOptionsVersion2c();
+        return mapaObjetos.get(modelo) ?? new ClientOptionsVersion2c();
     }
 
 }
