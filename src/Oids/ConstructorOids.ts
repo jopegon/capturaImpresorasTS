@@ -12,7 +12,6 @@ import { OidsMXB427PW } from "./OidsEspecificos/OidsMXB427PW.js";
 import { OidIniciales } from "./OidsIniciales.js";
 
 
-
 export class ConstructorOids {
 
     /*

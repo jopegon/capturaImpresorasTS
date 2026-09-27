@@ -1,9 +1,9 @@
-import type { Impresora } from "./clases/Impresora.js";
+import type { Impresora } from "./Impresora.js";
 import { AbstractConsultaImpresora } from "./AbstractConsultaImpresora.js";
 
 
 
-export class ConsultaImpresora  extends AbstractConsultaImpresora{
+export class ConsultaImpresoraV2c  extends AbstractConsultaImpresora{
 
     constructor(impresora: Impresora) {
         super(impresora);

@@ -1,10 +1,11 @@
-import { Impresora } from "./clases/Impresora.js";
-import { ConsultaImpresora } from "./ConsultaImpresora.js";
+import type { AbstractConsultaImpresora } from "./Impresoras/AbstractConsultaImpresora.js";
+import { ConstructorConsultaImpresora } from "./Impresoras/ConstructorConsultaImpresora.js";
+import { Impresora } from "./Impresoras/Impresora.js";
 
 
 let impresora:Impresora = new Impresora('10.41.81.239', 'Policía Judicial, Pasillo (secretaría)');
 
-let consulta:ConsultaImpresora = new ConsultaImpresora(impresora);
+let consulta:AbstractConsultaImpresora = new ConstructorConsultaImpresora().construyeConsultaImpresora(impresora);
 
 try{
     impresora=await consulta.getDatos();
