@@ -57,12 +57,8 @@ export class ConstructorOids {
         }
 
         // Si no encuentra el modelo, devuelve la configuración genérica
-        console.log(` el modelo es  ${this.MapaObjetos.get(modelo)?.oidTonerLevelCyan}`)
         return this.MapaObjetos.get(modelo) ?? new OidIniciales();
     }
-
-
-
 
 
 }

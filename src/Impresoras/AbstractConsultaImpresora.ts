@@ -246,10 +246,10 @@ export abstract class AbstractConsultaImpresora {
             return this.impresora;
         }
 
-        const oids = new ConstructorOids().OidsInicialesDe(this.impresora.modelo);
+        this.oids = new ConstructorOids().OidsInicialesDe(this.impresora.modelo);
 
         try {
-            const varbinds = await this.obtenerDatos(oids.listaOids);
+            const varbinds = await this.obtenerDatos(this.oids.listaOids);
             const mapVarbinds = this.varbindsToMap(varbinds);
             this.setNumeroSerie(mapVarbinds);
             this.setContadorPaginas(mapVarbinds);
