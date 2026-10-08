@@ -1,3 +1,5 @@
+import * as snmp from "net-snmp";
+
 export interface IImpresora {
   // Propiedades básicas (Datos de red e identificación)
   modelo: string;
@@ -6,14 +8,17 @@ export interface IImpresora {
   localizacion: string;
   observaciones: string;
 
+  versionSnmp:typeof snmp.Version1 | typeof snmp.Version2c;
+
+
   // Niveles de consumibles
-  negro: number;
-  magenta: number;
-  cyan: number;
-  amarillo: number;
+  negro: number | undefined;
+  magenta: number | undefined;
+  cyan: number | undefined;
+  amarillo: number | undefined;
 
   // Estados y contadores
-  color: boolean;
+  color: boolean | undefined;
   conectada: boolean;
   contador: number;
   contadorFotocopias: number;

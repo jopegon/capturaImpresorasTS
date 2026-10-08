@@ -13,6 +13,10 @@ export class Oids28BW5e extends OidIniciales {
         this.oidTonerLevelAmarillo = '1.3.6.1.2.1.43.11.1.1.9.1.2.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1';
         this.oidFullCapacityAmarillo = '1.3.6.1.2.1.43.11.1.1.8.1.2.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1';
 
+        this.listaOids = [this.oidNumeroDeSerie, this.oidContadorImpresiones, this.oidTonerLevelNegro,
+                this.oidFullCapacityNegro, this.oidFullCapacityAmarillo, this.oidTonerLevelAmarillo,
+                this.oidFullCapacityCyan, this.oidTonerLevelCyan, this.oidFullCapacityMagenta, this.oidTonerLevelMagenta];
+
     }
 
     // Datos erroneos puestos a posta, es impresora b/n sino la detecta color

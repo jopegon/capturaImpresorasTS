@@ -3,7 +3,7 @@ import { AbstractConsultaImpresora } from "./AbstractConsultaImpresora.js";
 
 
 
-export class ConsultaImpresoraV2c  extends AbstractConsultaImpresora{
+export class ConsultaImpresora  extends AbstractConsultaImpresora{
 
     constructor(impresora: Impresora) {
         super(impresora);

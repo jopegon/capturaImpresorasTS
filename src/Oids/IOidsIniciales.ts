@@ -18,4 +18,5 @@ export interface IOidsIniciales {
     oidFullCapacityAmarillo: string;
 
     listaOids: string[];
+
 }

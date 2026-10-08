@@ -4,6 +4,7 @@ import { ConstructorOids } from "../Oids/ConstructorOids.js";
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
 import type { Impresora } from "./Impresora.js";
 import * as snmp from "net-snmp";
+import { crearSesion, snmpGet } from "./utilidadesSesion.js";
 
 export type ValorContador = number | string | undefined;
 
@@ -15,7 +16,6 @@ export abstract class AbstractConsultaImpresora {
 
     protected clientOptions: IClientOptions;
 
-
     constructor(impresora: Impresora) {
         this.impresora = impresora;
 
@@ -24,41 +24,9 @@ export abstract class AbstractConsultaImpresora {
 
         // Inicialmente desconocemos el modelo de impresora.
         // Estos OID permiten realizar la identificación inicial.
-        this.oids = new ConstructorOids().OidsInicialesDe();
+        this.oids = new ConstructorOids().OidsInicialesDe(this.impresora.modelo);
     }
 
-    protected crearSesion(): snmp.Session {
-        return snmp.createSession(
-            this.impresora.ip,
-            this.clientOptions.community,
-            this.clientOptions // mismo objeto en TODOS los createSession
-        );
-    }
-
-    /**
-     * Realiza una consulta SNMP utilizando la sesión proporcionada.
-     *
-     * @param session Sesión SNMP activa.
-     * @param oids OID que se desean consultar.
-     * @returns Lista de Varbind obtenidos.
-     */
-    protected async snmpGet(session: snmp.Session, oids: string[]): Promise<snmp.Varbind[]> {
-
-        return new Promise<snmp.Varbind[]>((resolve, reject) => {
-
-            session.get(oids, (error: Error | null, varbinds?: snmp.Varbind[]) => {
-
-                if (error) {
-                    reject(error instanceof Error ? error : new Error(String(error)));
-                    //reject(varbinds ?? [])
-                    return;
-                }
-
-                resolve(varbinds ?? []);
-            }
-            );
-        });
-    }
 
     /**
      * Obtiene el modelo de la impresora mediante SNMP.
@@ -66,17 +34,14 @@ export abstract class AbstractConsultaImpresora {
      * Es necesario conocer el modelo antes de generar los OID
      * específicos de cada fabricante/modelo.
      */
-    protected async getModelo(): Promise<string> {
+    public async getModelo(): Promise<string> {
 
-        const session = this.crearSesion();
+        const session = crearSesion(this.impresora, this.clientOptions);
 
 
         try {
 
-            const varbinds = await this.snmpGet(
-                session,
-                [this.oids.oidModelo]
-            );
+            const varbinds = await snmpGet(session,[this.oids.oidModelo]);
 
             if (varbinds.length === 0 || !varbinds[0]) {
                 return "";
@@ -106,18 +71,62 @@ export abstract class AbstractConsultaImpresora {
      * Es necesario conocer el modelo antes de generar los OID
      * específicos de cada fabricante/modelo.
      */
-    private async obtenerDatos(listaOids: string[]): Promise<snmp.Varbind[]> {
+    private async obtenerDatosV2c(listaOids: string[]): Promise<snmp.Varbind[]> {
 
 
-        const session = this.crearSesion();
+        const session = crearSesion(this.impresora, this.clientOptions);
 
         try {
-
-            const varbinds: snmp.Varbind[] = await this.snmpGet(session, listaOids);
-            return varbinds;
+            return await snmpGet(session, listaOids);;
 
         } finally {
             session.close();
+        }
+
+    }
+
+    /**
+     * Obtiene el modelo de la impresora mediante SNMP.
+     *
+     * Es necesario conocer el modelo antes de generar los OID
+     * específicos de cada fabricante/modelo.
+     */
+    private async obtenerDatosV1(listaOids: string[]): Promise<snmp.Varbind[]> {
+
+        const session = crearSesion(this.impresora, this.clientOptions);
+        try {
+
+            // Primero intentamos obtener todos los OID
+            // en una única petición.
+            return await snmpGet(session, listaOids);
+
+        } catch (error) {
+
+            // Si falla la petición completa, hacemos
+            // las consultas individualmente.
+            const resultados: snmp.Varbind[] = [];
+
+            for (const oid of listaOids) {
+
+                try {
+
+                    const varbinds = await snmpGet(session, [oid]);
+
+                    if (varbinds.length > 0) {
+                        resultados.push(...varbinds);
+                    }
+
+                } catch (errorIndividual) {
+
+                    // Este OID no está disponible.
+                    // Continuamos con el siguiente.
+                    console.warn(
+                        `OID no disponible: ${oid}`
+                    );
+                }
+            }
+
+            return resultados;
         }
 
     }
@@ -226,30 +235,15 @@ export abstract class AbstractConsultaImpresora {
 
     public async getDatos(): Promise<Impresora> {
 
-        const versiones = [snmp.Version2c, snmp.Version1];
-
-        for (const version of versiones) {
-            this.clientOptions.version = version;
-            try {
-                await this.getModelo();
-                if (this.impresora.modelo.length > 0) {
-                    this.impresora.conectada = true;
-                    break;
-                }
-            } catch {
-                // timeout o error de red con esta versión; probamos la siguiente
-            }
-        }
-
-
-        if (!this.impresora.conectada) {
-            return this.impresora;
-        }
-
-        this.oids = new ConstructorOids().OidsInicialesDe(this.impresora.modelo);
-
         try {
-            const varbinds = await this.obtenerDatos(this.oids.listaOids);
+            let varbinds: snmp.Varbind[];
+
+            if (this.impresora.versionSnmp === snmp.Version2c) {
+                varbinds = await this.obtenerDatosV2c(this.oids.listaOids);
+            } else {
+                varbinds = await this.obtenerDatosV1(this.oids.listaOids);
+            }
+
             const mapVarbinds = this.varbindsToMap(varbinds);
             this.setNumeroSerie(mapVarbinds);
             this.setContadorPaginas(mapVarbinds);
@@ -257,7 +251,7 @@ export abstract class AbstractConsultaImpresora {
             this.setNivelAmarillo(mapVarbinds);
             this.setNivelCyan(mapVarbinds);
             this.setNivelMagenta(mapVarbinds);
-            if (this.impresora.magenta !== undefined) {
+            if (this.impresora.magenta !== undefined && this.impresora.amarillo!== undefined && this.impresora.cyan!== undefined) {
                 this.impresora.color = true;
             }
         } catch (error) {
