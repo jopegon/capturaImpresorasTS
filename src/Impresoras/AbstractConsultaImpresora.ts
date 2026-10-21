@@ -1,10 +1,8 @@
-import { ConstructorClientOptions } from "../ClientOptions/ConstructorClientOptions.js";
-import type { IClientOptions } from "../ClientOptions/IClientOptions.js";
-import { ConstructorOids } from "../Oids/ConstructorOids.js";
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
 import type { Impresora } from "./Impresora.js";
 import * as snmp from "net-snmp";
 import { crearSesion, snmpGet } from "./utilidadesSesion.js";
+import { OperacionesPerfiles } from "../PerfilesImpresoras/OperacionesPerfiles.js";
 
 export type ValorContador = number | string | undefined;
 
@@ -14,18 +12,18 @@ export abstract class AbstractConsultaImpresora {
 
     protected oids: IOidsIniciales;
 
-    protected clientOptions: IClientOptions;
+    protected clientOptions: snmp.SessionOptions;
 
     constructor(impresora: Impresora) {
         this.impresora = impresora;
 
-        // Por defecto carga la conf para version2c
+        //this.clientOptions = ConstructorClientOptions.clientOptions(this.impresora.modelo);
 
-        this.clientOptions = new ConstructorClientOptions().clientOptions(this.impresora.modelo);
+        this.clientOptions= OperacionesPerfiles.getClientOptions(this.impresora.modelo)
 
         // Inicialmente desconocemos el modelo de impresora.
         // Estos OID permiten realizar la identificación inicial.
-        this.oids = new ConstructorOids().OidsInicialesDe(this.impresora.modelo);
+        this.oids =  OperacionesPerfiles.getOids(this.impresora.modelo)
     }
 
 
@@ -37,7 +35,7 @@ export abstract class AbstractConsultaImpresora {
      */
     public async getModelo(): Promise<string> {
 
-        const session = crearSesion(this.impresora, this.clientOptions);
+        const session = crearSesion(this.impresora);
 
 
         try {
@@ -75,7 +73,7 @@ export abstract class AbstractConsultaImpresora {
     private async obtenerDatosV2c(listaOids: string[]): Promise<snmp.Varbind[]> {
 
 
-        const session = crearSesion(this.impresora, this.clientOptions);
+        const session = crearSesion(this.impresora);
 
         try {
             return await snmpGet(session, listaOids);;
@@ -94,7 +92,7 @@ export abstract class AbstractConsultaImpresora {
      */
     private async obtenerDatosV1(listaOids: string[]): Promise<snmp.Varbind[]> {
 
-        const session = crearSesion(this.impresora, this.clientOptions);
+        const session = crearSesion(this.impresora);
         try {
 
             // Primero intentamos obtener todos los OID

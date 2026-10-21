@@ -1,12 +1,14 @@
 import * as snmp from "net-snmp";
 import type { IImpresora } from "./IImpresora.js";
-import type { IClientOptions } from "../ClientOptions/IClientOptions.js";
+import { ClientOptions } from "../ClientOptions/ClientOptions.js";
+import { OperacionesPerfiles } from "../PerfilesImpresoras/OperacionesPerfiles.js";
 
-export function crearSesion(impresora: IImpresora, clientOptions: IClientOptions): snmp.Session {
+export function crearSesion(impresora: IImpresora): snmp.Session {
+
     return snmp.createSession(
         impresora.ip,
-        clientOptions.community,
-        clientOptions // mismo objeto en TODOS los createSession
+        ClientOptions.community,
+        OperacionesPerfiles.getClientOptions(impresora.modelo)
     );
 }
 

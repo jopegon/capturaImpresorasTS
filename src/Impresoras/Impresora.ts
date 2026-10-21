@@ -22,9 +22,9 @@ export class Impresora implements IImpresora {
   contadorFotocopias: number = 0;
 
 
-  constructor(ip: string, localizacion: string) {
+  constructor(ip: string, localizacion?: string) {
     this.ip = ip;
-    this.localizacion = localizacion;
+    this.localizacion = localizacion ?? '';
   }
 
 

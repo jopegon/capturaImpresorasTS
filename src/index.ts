@@ -1,7 +1,9 @@
 import type { AbstractConsultaImpresora } from "./Impresoras/AbstractConsultaImpresora.js";
-import { ConstructorConsultaImpresora } from "./Impresoras/ConstructorConsultaImpresora.js";
+//import { ConstructorConsultaImpresora } from "./Impresoras/ConstructorConsultaImpresora.js";
 import { IdentificadorImpresora } from "./Impresoras/IdentificadorImpresora.js";
 import { Impresora } from "./Impresoras/Impresora.js";
+import { OperacionesPerfiles } from "./PerfilesImpresoras/OperacionesPerfiles.js";
+
 
 
 
@@ -19,7 +21,7 @@ async function consulta(ip: string, localizacion:string) {
         console.log(`------------------------${impresora.modelo}---------------------------`)
 
         if (impresora.conectada) {
-            let consulta: AbstractConsultaImpresora = await new ConstructorConsultaImpresora().construyeConsultaImpresora(impresora);
+            let consulta: AbstractConsultaImpresora =  new OperacionesPerfiles().getConsulta(impresora);
             impresora = await consulta.getDatos();
         }
 

@@ -1,17 +1,15 @@
 import * as snmp from "net-snmp";
 import type { Impresora } from "./Impresora.js";
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
-import type { IClientOptions } from "../ClientOptions/IClientOptions.js";
-import { ConstructorClientOptions } from "../ClientOptions/ConstructorClientOptions.js";
-import { ConstructorOids } from "../Oids/ConstructorOids.js";
 import { crearSesion, snmpGet } from "./utilidadesSesion.js";
+import { OperacionesPerfiles } from "../PerfilesImpresoras/OperacionesPerfiles.js";
 
 export class IdentificadorImpresora {
 
 
     protected oids: IOidsIniciales;
 
-    protected clientOptions: IClientOptions;
+    protected clientOptions: snmp.SessionOptions;
 
     protected impresora: Impresora;
 
@@ -19,11 +17,11 @@ export class IdentificadorImpresora {
         this.impresora = impresora;
 
         // Por defecto carga la conf para version2c
-        this.clientOptions = new ConstructorClientOptions().clientOptions();
+        this.clientOptions =  OperacionesPerfiles.getClientOptions(this.impresora.modelo)
 
         // Inicialmente desconocemos el modelo de impresora.
         // Estos OID permiten realizar la identificación inicial.
-        this.oids = new ConstructorOids().OidsInicialesDe();
+        this.oids = OperacionesPerfiles.getOids('');
     }
 
 
@@ -36,7 +34,7 @@ export class IdentificadorImpresora {
  */
     protected async getModelo(): Promise<string> {
 
-        const session = crearSesion(this.impresora, this.clientOptions);
+        const session = crearSesion(this.impresora);
 
 
         try {
