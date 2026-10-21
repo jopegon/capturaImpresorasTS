@@ -20,10 +20,16 @@ export class ConstructorClientOptions {
     clientOptions(modelo?: string): IClientOptions {
 
 
+        let mapaObjetos = new Map<string, IClientOptions>;
+        mapaObjetos.set("B430", new ClientOptionsVersion1());
+        mapaObjetos.set("EPSON AL-M4000", new ClientOptionsVersion1());
+        mapaObjetos.set("HP LaserJet Pro M201dw", new ClientOptionsVersion1());
+
         // Para el caso en el que no se proporciona ningún parámetro
         if (!modelo) {
             return new ClientOptionsVersion2c();
         }
+
 
         return mapaObjetos.get(modelo) ?? new ClientOptionsVersion2c();
     }

@@ -4,22 +4,68 @@ import { IdentificadorImpresora } from "./Impresoras/IdentificadorImpresora.js";
 import { Impresora } from "./Impresoras/Impresora.js";
 
 
-let impresora:Impresora = new Impresora('192.168.1.142', 'Pasillo (secretaría)');
 
-try{
 
-    let identificadorImpresora:IdentificadorImpresora = new IdentificadorImpresora(impresora);
-    impresora= await identificadorImpresora.identificar();
+async function consulta(ip: string, localizacion:string) {
+    let impresora: Impresora = new Impresora(ip, localizacion);
+    try {
 
-    if (impresora.conectada){
-        let consulta:AbstractConsultaImpresora = await new ConstructorConsultaImpresora().construyeConsultaImpresora(impresora);
-        impresora=await consulta.getDatos();
+        let identificadorImpresora: IdentificadorImpresora = new IdentificadorImpresora(impresora);
+
+        
+
+        impresora = await identificadorImpresora.identificar();
+
+        console.log(`------------------------${impresora.modelo}---------------------------`)
+
+        if (impresora.conectada) {
+            let consulta: AbstractConsultaImpresora = await new ConstructorConsultaImpresora().construyeConsultaImpresora(impresora);
+            impresora = await consulta.getDatos();
+        }
+
     }
+    catch {
+        // No hacer nada
+        console.warn(`he generado un error`)
+    }
+    console.log(` ${impresora.toString()} `) 
+}
 
-}
-catch{
-    // No hacer nada
-    console.warn(`he generado un error`)
-}
-          
-console.log(` ${impresora.toString()} `) 
+
+await consulta('10.41.81.217', 'Pasillo (secretaría)') 
+
+
+
+await consulta('10.41.113.232', 'Pasillo (secretaría)') 
+
+
+await consulta('10.41.81.219', 'Pasillo (secretaría)')
+
+await consulta('10.41.81.233', 'Pasillo (secretaría)')
+
+await consulta('10.41.81.215', 'Pasillo (secretaría)')
+
+await consulta('10.41.81.245', 'Pasillo (secretaría)')
+
+await consulta('10.41.82.201', 'Pasillo (secretaría)')
+
+await consulta('10.41.97.238', 'Pasillo (secretaría)')
+
+await consulta('10.41.97.232', 'Pasillo (secretaría)')
+
+await consulta('10.41.97.70', 'Pasillo (secretaría)')
+
+await consulta('10.41.81.232', 'Pasillo (secretaría)')
+
+await consulta('10.41.97.234', 'Pasillo (secretaría)')
+
+await consulta('10.41.97.246', 'Pasillo (secretaría)')
+
+await consulta('10.41.97.241', 'Pasillo (secretaría)')
+
+await consulta('10.41.97.227', 'Pasillo (secretaría)')
+
+await consulta('10.41.81.227', 'Pasillo (secretaría)')
+
+
+

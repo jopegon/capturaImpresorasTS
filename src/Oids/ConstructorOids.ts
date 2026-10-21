@@ -1,3 +1,4 @@
+import type { IOidsIniciales } from "./IOidsIniciales.js";
 import { Oids1606dn } from "./OidsEspecificos/Oids1606dn.js";
 import { Oids28BW5e } from "./OidsEspecificos/Oids28BW5e.js";
 import { Oids5020i } from "./OidsEspecificos/Oids5020i.js";
@@ -8,6 +9,7 @@ import { OidsC8800 } from "./OidsEspecificos/OidsC8800.js";
 import { OidsEpsonM4000 } from "./OidsEspecificos/OidsEpsonM4000.js";
 import { OidsKyoceraTodas } from "./OidsEspecificos/OidsKyoceraTodas.js";
 import { OidsL6910 } from "./OidsEspecificos/OidsL6910DN.js";
+import { OidsM201dw } from "./OidsEspecificos/OidsM201dw.js";
 import { OidsMXB427PW } from "./OidsEspecificos/OidsMXB427PW.js";
 import { OidIniciales } from "./OidsIniciales.js";
 
@@ -26,6 +28,7 @@ export class ConstructorOids {
         ["Xerox VersaLink C405 DN Multifunction Printer", new OidsC405()],
         ["HP LaserJet Professional P1606dn", new Oids1606dn()],
         ["HP LaserJet Flow MFP E52645", new Oids_HP_E52645()],
+        ["HP LaserJet Pro M201dw", new OidsM201dw()],
         ["C8800", new OidsC8800()],
         ["ECOSYS M3655idn", new OidsKyoceraTodas()],
         ["ECOSYS MA5500ifx", new OidsKyoceraTodas()],
@@ -49,7 +52,6 @@ export class ConstructorOids {
      * @returns Los OID iniciales asociados al modelo o una configuración genérica.
      */
     OidsInicialesDe(modelo?: string): OidIniciales {
-
         
         // Para el caso en el que no se proporciona ningún parámetro
         if (!modelo) {

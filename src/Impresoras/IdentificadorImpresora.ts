@@ -74,7 +74,6 @@ export class IdentificadorImpresora {
                     break;
                 }
             } catch {
-                console.warn(`genero error identificando con ${version}`)
                 // timeout o error de red con esta versión; probamos la siguiente
             }
 

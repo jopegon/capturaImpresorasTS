@@ -21,9 +21,9 @@ export class OidIniciales implements IOidsIniciales {
     oidTonerLevelAmarillo: string = '1.3.6.1.2.1.43.11.1.1.9.1.4';
     oidFullCapacityAmarillo: string = '1.3.6.1.2.1.43.11.1.1.8.1.4';
 
-     listaOids: string[] = [this.oidNumeroDeSerie, this.oidContadorImpresiones, this.oidTonerLevelNegro,
-    this.oidFullCapacityNegro, this.oidFullCapacityAmarillo, this.oidTonerLevelAmarillo,
-    this.oidFullCapacityCyan, this.oidTonerLevelCyan, this.oidFullCapacityMagenta, this.oidTonerLevelMagenta];
+    listaOids: string[] = [this.oidNumeroDeSerie, this.oidContadorImpresiones, this.oidTonerLevelNegro,
+        this.oidFullCapacityNegro, this.oidFullCapacityAmarillo, this.oidTonerLevelAmarillo,
+        this.oidFullCapacityCyan, this.oidTonerLevelCyan, this.oidFullCapacityMagenta, this.oidTonerLevelMagenta];
 
 
   

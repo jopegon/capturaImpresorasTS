@@ -20,7 +20,8 @@ export abstract class AbstractConsultaImpresora {
         this.impresora = impresora;
 
         // Por defecto carga la conf para version2c
-        this.clientOptions = new ConstructorClientOptions().clientOptions();
+
+        this.clientOptions = new ConstructorClientOptions().clientOptions(this.impresora.modelo);
 
         // Inicialmente desconocemos el modelo de impresora.
         // Estos OID permiten realizar la identificación inicial.
@@ -41,7 +42,7 @@ export abstract class AbstractConsultaImpresora {
 
         try {
 
-            const varbinds = await snmpGet(session,[this.oids.oidModelo]);
+            const varbinds = await snmpGet(session, [this.oids.oidModelo]);
 
             if (varbinds.length === 0 || !varbinds[0]) {
                 return "";
@@ -158,7 +159,7 @@ export abstract class AbstractConsultaImpresora {
             return undefined;
         }
 
-        return (nivel / capacidad) * 100;
+        return Math.round((nivel / capacidad) * 100);
     }
 
 
@@ -221,20 +222,28 @@ export abstract class AbstractConsultaImpresora {
 
 
 
-    protected varbindsToMap(varbinds: snmp.Varbind[]): Map<string, string | number> {
-        return varbinds.reduce<Map<string, string | number>>((map, varbind) => {
-            if (!snmp.isVarbindError(varbind)) {
-                const valor = Buffer.isBuffer(varbind.value)
-                    ? varbind.value.toString('utf8')
-                    : varbind.value;
-                map.set(varbind.oid, valor as string | number);
-            }
-            return map;
-        }, new Map());
+    protected varbindsToMap(
+        varbinds: snmp.Varbind[]
+    ): Map<string, string | number> {
+
+        return varbinds.reduce<Map<string, string | number>>(
+            (map, varbind) => {
+
+                if (!snmp.isVarbindError(varbind)) {
+
+                    const valor = Buffer.isBuffer(varbind.value)
+                        ? varbind.value.toString('hex')
+                        : varbind.value;
+
+                    map.set(varbind.oid, valor as string | number);
+                }
+
+                return map;
+            },
+            new Map<string, string | number>()
+        );
     }
-
     public async getDatos(): Promise<Impresora> {
-
         try {
             let varbinds: snmp.Varbind[];
 
@@ -251,7 +260,7 @@ export abstract class AbstractConsultaImpresora {
             this.setNivelAmarillo(mapVarbinds);
             this.setNivelCyan(mapVarbinds);
             this.setNivelMagenta(mapVarbinds);
-            if (this.impresora.magenta !== undefined && this.impresora.amarillo!== undefined && this.impresora.cyan!== undefined) {
+            if (this.impresora.magenta !== undefined && this.impresora.amarillo !== undefined && this.impresora.cyan !== undefined) {
                 this.impresora.color = true;
             }
         } catch (error) {

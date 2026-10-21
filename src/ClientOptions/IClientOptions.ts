@@ -6,7 +6,7 @@ export abstract class IClientOptions {
     protected clientOptions: snmp.SessionOptions = {
         port: 161,
         retries: 3,
-        timeout: 250,
+        timeout: 1000,
         version: snmp.Version2c,
     }
 
