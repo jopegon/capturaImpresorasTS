@@ -11,12 +11,8 @@ import { OperacionesPerfiles } from "./PerfilesImpresoras/OperacionesPerfiles.js
 async function consulta(ip: string, localizacion:string) {
     let impresora: Impresora = new Impresora(ip, localizacion);
     try {
-
-        let identificadorImpresora: IdentificadorImpresora = new IdentificadorImpresora(impresora);
-
-        
-
-        impresora = await identificadorImpresora.identificar();
+   
+        impresora = await new IdentificadorImpresora(impresora).identificar();
 
         console.log(`------------------------${impresora.modelo}---------------------------`)
 

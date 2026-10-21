@@ -1,7 +1,8 @@
-import { ClientOptions } from "../ClientOptions/ClientOptions.js";
+
 import { AbstractConsultaImpresora } from "../Impresoras/AbstractConsultaImpresora.js";
 import { ConsultaBizhub5020i } from "../Impresoras/ConsultaBizhub5020i.js";
 import { ConsultaGenerica } from "../Impresoras/ConsultaGenerica.js";
+import { ConsultaL6910DN } from "../Impresoras/ConsultaL6910DN.js";
 import { Impresora } from "../Impresoras/Impresora.js";
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
 import { Oids1606dn } from "../Oids/OidsEspecificos/Oids1606dn.js";
@@ -17,27 +18,22 @@ import { OidsL6910 } from "../Oids/OidsEspecificos/OidsL6910DN.js";
 import { OidsM201dw } from "../Oids/OidsEspecificos/OidsM201dw.js";
 import { OidsMXB427PW } from "../Oids/OidsEspecificos/OidsMXB427PW.js";
 import { OidIniciales } from "../Oids/OidsIniciales.js";
+import type { ConfigSnmp } from "../sessionSnmp/sesionSnmp.js";
 
 
 export type TPerfilImpresora = {
     /** Factory de OIDs (se llama cuando ya se conoce el modelo) */
     oids: () => IOidsIniciales;
 
-    /** Factory de opciones SNMP (versión, timeout, etc.) */
-    clientOptions?: () => ClientOptions;
-
     /** Factory de la estrategia de consulta (puede especializar setNivelNegro, etc.) */
     consulta?: (impresora: Impresora) => AbstractConsultaImpresora;
 };
 
-const v1 = () => new ClientOptions().getClientOptionsV1();
-const v2c = () => new ClientOptions().getClientOptionsV2c();
 const consultaDefault = (impresora: Impresora) => new ConsultaGenerica(impresora);
 
 /** Perfil genérico cuando el modelo no está registrado */
 export const perfilGenerico: TPerfilImpresora = {
     oids: () => new OidIniciales(),
-    clientOptions: v2c,
     consulta: consultaDefault,
 
 };
@@ -46,14 +42,12 @@ export const registroPerfiles = new Map<string, TPerfilImpresora>([
 
     ["B430",
         {
-            oids: () => new OidsB430(),
-            clientOptions: v1
+            oids: () => new OidsB430()
         }
     ],
     ["EPSON AL-M4000",
         {
-            oids: () => new OidsEpsonM4000(),
-            clientOptions: v1
+            oids: () => new OidsEpsonM4000()
         }
     ],
     ["KONICA MINOLTA bizhub 5020i",
@@ -66,16 +60,14 @@ export const registroPerfiles = new Map<string, TPerfilImpresora>([
         { oids: () => new OidsC405() }
     ],
     ["HP LaserJet Professional P1606dn", {
-        oids: () => new Oids1606dn(),
-        clientOptions: v1
+        oids: () => new Oids1606dn()
     }],
     ["HP LaserJet Flow MFP E52645",
         { oids: () => new Oids_HP_E52645() }
     ],
     ["HP LaserJet Pro M201dw",
         {
-            oids: () => new OidsM201dw(),
-            clientOptions: v1
+            oids: () => new OidsM201dw()
         }
     ],
     ["C8800",
@@ -100,6 +92,5 @@ export const registroPerfiles = new Map<string, TPerfilImpresora>([
         { oids: () => new OidsMXB427PW() }
     ],
     ["Brother MFC-L6910DN series",
-        { oids: () => new OidsL6910() }
-    ]
+        { oids: () => new OidsL6910(), consulta: (imp) => new ConsultaL6910DN(imp) }]
 ]);

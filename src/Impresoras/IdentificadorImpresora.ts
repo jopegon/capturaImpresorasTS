@@ -1,27 +1,25 @@
 import * as snmp from "net-snmp";
 import type { Impresora } from "./Impresora.js";
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
-import { crearSesion, snmpGet } from "./utilidadesSesion.js";
 import { OperacionesPerfiles } from "../PerfilesImpresoras/OperacionesPerfiles.js";
+import { crearSesion, snmpGet } from "../sessionSnmp/sesionSnmp.js";
 
 export class IdentificadorImpresora {
 
 
     protected oids: IOidsIniciales;
 
-    protected clientOptions: snmp.SessionOptions;
+
 
     protected impresora: Impresora;
 
     constructor(impresora: Impresora) {
         this.impresora = impresora;
 
-        // Por defecto carga la conf para version2c
-        this.clientOptions =  OperacionesPerfiles.getClientOptions(this.impresora.modelo)
 
         // Inicialmente desconocemos el modelo de impresora.
         // Estos OID permiten realizar la identificación inicial.
-        this.oids = OperacionesPerfiles.getOids('');
+        this.oids = new OperacionesPerfiles().getOids('');
     }
 
 
@@ -32,9 +30,8 @@ export class IdentificadorImpresora {
  * Es necesario conocer el modelo antes de generar los OID
  * específicos de cada fabricante/modelo.
  */
-    protected async getModelo(): Promise<string> {
-
-        const session = crearSesion(this.impresora);
+protected async getModelo(version: typeof snmp.Version1 | typeof snmp.Version2c): Promise<string> {
+    const session = crearSesion(this.impresora, version);
 
 
         try {
@@ -63,9 +60,8 @@ export class IdentificadorImpresora {
         const versiones = [snmp.Version2c, snmp.Version1];
 
         for (const version of versiones) {
-            this.clientOptions.version = version;
             try {
-                await this.getModelo();
+                await this.getModelo(version);
                 if (this.impresora.modelo.length > 0) {
                     this.impresora.conectada = true;
                     this.impresora.versionSnmp = version;

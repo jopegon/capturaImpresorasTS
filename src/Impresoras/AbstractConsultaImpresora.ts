@@ -1,8 +1,8 @@
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
 import type { Impresora } from "./Impresora.js";
 import * as snmp from "net-snmp";
-import { crearSesion, snmpGet } from "./utilidadesSesion.js";
 import { OperacionesPerfiles } from "../PerfilesImpresoras/OperacionesPerfiles.js";
+import { crearSesion, snmpGet } from "../sessionSnmp/sesionSnmp.js";
 
 export type ValorContador = number | string | undefined;
 
@@ -12,18 +12,13 @@ export abstract class AbstractConsultaImpresora {
 
     protected oids: IOidsIniciales;
 
-    protected clientOptions: snmp.SessionOptions;
-
     constructor(impresora: Impresora) {
         this.impresora = impresora;
 
-        //this.clientOptions = ConstructorClientOptions.clientOptions(this.impresora.modelo);
-
-        this.clientOptions= OperacionesPerfiles.getClientOptions(this.impresora.modelo)
 
         // Inicialmente desconocemos el modelo de impresora.
         // Estos OID permiten realizar la identificación inicial.
-        this.oids =  OperacionesPerfiles.getOids(this.impresora.modelo)
+        this.oids = new OperacionesPerfiles().getOids(this.impresora.modelo)
     }
 
 
