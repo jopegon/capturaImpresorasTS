@@ -1,7 +1,6 @@
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
 import type { Impresora } from "./Impresora.js";
 import * as snmp from "net-snmp";
-import { OperacionesPerfiles } from "../PerfilesImpresoras/OperacionesPerfiles.js";
 import { crearSesion, snmpGet } from "../sessionSnmp/sesionSnmp.js";
 
 export type ValorContador = number | string | undefined;

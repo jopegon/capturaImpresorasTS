@@ -1,7 +1,6 @@
 import * as snmp from "net-snmp";
 import type { Impresora } from "./Impresora.js";
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
-import { OperacionesPerfiles } from "../PerfilesImpresoras/OperacionesPerfiles.js";
 import { crearSesion, snmpGet } from "../sessionSnmp/sesionSnmp.js";
 import { OidsGenericos } from "../Oids/OidsEspecificos/OidsGenericos.js";
 
