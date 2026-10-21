@@ -12,13 +12,9 @@ export abstract class AbstractConsultaImpresora {
 
     protected oids: IOidsIniciales;
 
-    constructor(impresora: Impresora) {
+    constructor(impresora: Impresora, oids: IOidsIniciales) {
         this.impresora = impresora;
-
-
-        // Inicialmente desconocemos el modelo de impresora.
-        // Estos OID permiten realizar la identificación inicial.
-        this.oids = new OperacionesPerfiles().getOids(this.impresora.modelo)
+        this.oids = oids;
     }
 
 

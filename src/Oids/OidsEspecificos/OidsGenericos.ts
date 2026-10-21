@@ -1,6 +1,6 @@
-import type { IOidsIniciales } from "./IOidsIniciales.js";
+import type { IOidsIniciales } from "../IOidsIniciales.js";
 
-export class OidIniciales implements IOidsIniciales {
+export class OidsGenericos implements IOidsIniciales {
 
     oidModelo: string = '1.3.6.1.2.1.25.3.2.1.3.1';
     oidLocalizacion: string = '1.3.6.1.2.1.1.6.0';

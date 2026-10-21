@@ -1,7 +1,7 @@
-import { OidIniciales } from "../OidsIniciales.js";
+import { OidsGenericos } from "./OidsGenericos.js";
 
 
-export class Oids_HP_E52645 extends OidIniciales {
+export class Oids_HP_E52645 extends OidsGenericos {
 
 
     constructor(){

@@ -3,6 +3,7 @@ import type { Impresora } from "./Impresora.js";
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
 import { OperacionesPerfiles } from "../PerfilesImpresoras/OperacionesPerfiles.js";
 import { crearSesion, snmpGet } from "../sessionSnmp/sesionSnmp.js";
+import { OidsGenericos } from "../Oids/OidsEspecificos/OidsGenericos.js";
 
 export class IdentificadorImpresora {
 
@@ -19,7 +20,7 @@ export class IdentificadorImpresora {
 
         // Inicialmente desconocemos el modelo de impresora.
         // Estos OID permiten realizar la identificación inicial.
-        this.oids = new OperacionesPerfiles().getOids('');
+        this.oids = new OidsGenericos();
     }
 
 

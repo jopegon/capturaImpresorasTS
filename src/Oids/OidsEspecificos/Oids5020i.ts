@@ -1,6 +1,6 @@
-import { OidIniciales } from "../OidsIniciales.js";
+import { OidsGenericos } from "./OidsGenericos.js";
 
-export class Oids5020i extends OidIniciales {
+export class Oids5020i extends OidsGenericos {
 
     // Pongo el mismo oid porque el oidFullNegro no existe y tiene que tener uno que exista
 

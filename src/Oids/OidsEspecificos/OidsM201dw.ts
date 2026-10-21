@@ -1,7 +1,7 @@
-import { OidIniciales } from "../OidsIniciales.js";
+import { OidsGenericos } from "./OidsGenericos.js";
 
 
-export class OidsM201dw extends OidIniciales {
+export class OidsM201dw extends OidsGenericos {
 
     constructor() {
         super();

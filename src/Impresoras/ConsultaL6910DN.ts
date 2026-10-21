@@ -1,12 +1,13 @@
 import type { Impresora } from "./Impresora.js";
 import { AbstractConsultaImpresora } from "./AbstractConsultaImpresora.js";
+import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
 
 
 
 export class ConsultaL6910DN extends AbstractConsultaImpresora {
 
-    constructor(impresora: Impresora) {
-        super(impresora);
+    constructor(impresora: Impresora, oids: IOidsIniciales) {
+        super(impresora, oids);
     }
 
 
