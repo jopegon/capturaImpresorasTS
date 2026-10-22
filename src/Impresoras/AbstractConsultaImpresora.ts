@@ -3,7 +3,12 @@ import { SessionSnmp } from "../sessionSnmp/SessionSnmp.js";
 import type { Impresora } from "./Impresora.js";
 import * as snmp from "net-snmp";
 
-export type ValorContador = number | string | undefined;
+
+/** Valor tal como lo entrega net-snmp: los OctetString llegan como Buffer. */
+export type ValorSnmp = string | number | Buffer;
+
+export type ValorContador = ValorSnmp | undefined;
+
 
 export abstract class AbstractConsultaImpresora {
 
@@ -20,7 +25,7 @@ export abstract class AbstractConsultaImpresora {
         this.construirSesion = new SessionSnmp();
     }
 
-    protected setNumeroSerie(r: Map<string, string | number | Buffer>) {
+    protected setNumeroSerie(r: Map<string, ValorSnmp>) {
         const v = r.get(this.oids.oidNumeroDeSerie);
         this.impresora.numeroDeSerie = Buffer.isBuffer(v) ? v.toString("utf8") : (v?.toString() ?? "");
     }
@@ -33,11 +38,11 @@ export abstract class AbstractConsultaImpresora {
      */
     private async obtenerDatosV2c(listaOids: string[]): Promise<snmp.Varbind[]> {
 
-        let creaSesion = new SessionSnmp();
-        const session = creaSesion.crearSesion(this.impresora);
+  
+        const session = this.construirSesion.crearSesion(this.impresora);
 
         try {
-            return await creaSesion.snmpGet(session, listaOids);;
+            return await this.construirSesion.snmpGet(session, listaOids);;
 
         } finally {
             session.close();
@@ -53,13 +58,13 @@ export abstract class AbstractConsultaImpresora {
      */
     private async obtenerDatosV1(listaOids: string[]): Promise<snmp.Varbind[]> {
 
-        let creaSesion = new SessionSnmp();
-        const session = creaSesion.crearSesion(this.impresora);
+
+        const session = this.construirSesion.crearSesion(this.impresora);
         try {
 
             // Primero intentamos obtener todos los OID
             // en una única petición.
-            return await creaSesion.snmpGet(session, listaOids);
+            return await this.construirSesion.snmpGet(session, listaOids);
 
         } catch (error) {
 
@@ -71,7 +76,7 @@ export abstract class AbstractConsultaImpresora {
 
                 try {
 
-                    const varbinds = await creaSesion.snmpGet(session, [oid]);
+                    const varbinds = await this.construirSesion.snmpGet(session, [oid]);
 
                     if (varbinds.length > 0) {
                         resultados.push(...varbinds);
@@ -92,9 +97,9 @@ export abstract class AbstractConsultaImpresora {
 
     }
 
-    protected setContadorPaginas(resultados: Map<string, string | number>) {
+    protected setContadorPaginas(resultados: Map<string, ValorSnmp>) { 
 
-        const valor: number | string | undefined = resultados.get(this.oids.oidContadorImpresiones);
+        const valor: number | string | Buffer | undefined = resultados.get(this.oids.oidContadorImpresiones);
 
         // Validamos que el valor exista y que sea estrictamente de tipo 'number'
         if (typeof valor === 'number' && !Number.isNaN(valor)) {
@@ -124,7 +129,7 @@ export abstract class AbstractConsultaImpresora {
 
 
 
-    protected setNivelNegro(resultados: Map<string, string | number>) {
+    protected setNivelNegro(resultados: Map<string, ValorSnmp>) { 
         const porcentaje = this.calcularPorcentaje(
             resultados.get(this.oids.oidFullCapacityNegro),
             resultados.get(this.oids.oidTonerLevelNegro)
@@ -138,7 +143,7 @@ export abstract class AbstractConsultaImpresora {
     }
 
 
-    protected setNivelAmarillo(resultados: Map<string, string | number>) {
+    protected setNivelAmarillo(resultados: Map<string, ValorSnmp>) { 
         const porcentaje = this.calcularPorcentaje(
             resultados.get(this.oids.oidFullCapacityAmarillo),
             resultados.get(this.oids.oidTonerLevelAmarillo)
@@ -152,7 +157,7 @@ export abstract class AbstractConsultaImpresora {
     }
 
 
-    protected setNivelCyan(resultados: Map<string, string | number>) {
+    protected setNivelCyan(resultados: Map<string, ValorSnmp>) {
         const porcentaje = this.calcularPorcentaje(
             resultados.get(this.oids.oidFullCapacityCyan),
             resultados.get(this.oids.oidTonerLevelCyan)
@@ -166,7 +171,7 @@ export abstract class AbstractConsultaImpresora {
     }
 
 
-    protected setNivelMagenta(resultados: Map<string, string | number>) {
+    protected setNivelMagenta(resultados:Map<string, ValorSnmp>) {
         const porcentaje = this.calcularPorcentaje(
             resultados.get(this.oids.oidFullCapacityMagenta),
             resultados.get(this.oids.oidTonerLevelMagenta)
@@ -182,27 +187,24 @@ export abstract class AbstractConsultaImpresora {
 
 
 
-    protected varbindsToMap(
-        varbinds: snmp.Varbind[]
-    ): Map<string, string | number> {
+protected varbindsToMap(
+    varbinds: snmp.Varbind[]
+): Map<string, ValorSnmp> {
 
-        return varbinds.reduce<Map<string, string | number>>(
-            (map, varbind) => {
+    return varbinds.reduce<Map<string, ValorSnmp>>(
+        (map, varbind) => {
 
-                if (!snmp.isVarbindError(varbind)) {
+            if (!snmp.isVarbindError(varbind)) {
+                map.set(varbind.oid, varbind.value as ValorSnmp);
+            }
 
-                    const valor = Buffer.isBuffer(varbind.value)
-                        ? varbind.value.toString('hex')
-                        : varbind.value;
+            return map;
+        },
+        new Map<string, ValorSnmp>()
+    );
+}
 
-                    map.set(varbind.oid, valor as string | number);
-                }
 
-                return map;
-            },
-            new Map<string, string | number>()
-        );
-    }
     public async getDatos(): Promise<Impresora> {
         try {
             let varbinds: snmp.Varbind[];

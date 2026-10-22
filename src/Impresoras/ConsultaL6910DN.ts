@@ -1,5 +1,5 @@
 import type { Impresora } from "./Impresora.js";
-import { AbstractConsultaImpresora } from "./AbstractConsultaImpresora.js";
+import { AbstractConsultaImpresora, type ValorSnmp } from "./AbstractConsultaImpresora.js";
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
 
 
@@ -47,29 +47,26 @@ parseBrotherBlackToner(value: string): number | null {
     return null;
 }
 
-    protected setNivelNegro(resultados: Map<string, string | number>): void {
+protected setNivelNegro(resultados: Map<string, ValorSnmp>): void {
 
-        const nivel = resultados.get(this.oids.oidTonerLevelNegro);
+    const nivel = resultados.get(this.oids.oidTonerLevelNegro);
 
-        if (nivel === undefined) {
-            return;
-        }
-
-        if (typeof nivel !== "string") {
-            return;
-        }
-
-
-        const percentage = this.parseBrotherBlackToner(nivel);
-
-
-        if (percentage === null) {
-            return;
-        }
-        this.impresora.negro = percentage;
-
-        // Aquí puedes asignar percentage al nivel de tóner negro
-        // utilizando la propiedad correspondiente de Impresora.
+    if (nivel === undefined) {
+        return;
     }
 
+    // El OID de la Brother es un blob binario: llega como Buffer
+    const hex = Buffer.isBuffer(nivel) ? nivel.toString("hex") : nivel;
+
+    if (typeof hex !== "string") {
+        return;
+    }
+
+    const percentage = this.parseBrotherBlackToner(hex);
+
+    if (percentage === null) {
+        return;
+    }
+    this.impresora.negro = percentage;
+}
 }
