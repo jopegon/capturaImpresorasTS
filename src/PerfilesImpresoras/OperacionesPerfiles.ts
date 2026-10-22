@@ -1,7 +1,6 @@
 import type { AbstractConsultaImpresora } from "../Impresoras/AbstractConsultaImpresora.js";
 import { ConsultaGenerica } from "../Impresoras/ConsultaGenerica.js";
 import type { Impresora } from "../Impresoras/Impresora.js";
-import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
 import { OidsGenericos } from "../Oids/OidsEspecificos/OidsGenericos.js";
 import { perfilGenerico, registroPerfiles, type TPerfilImpresora } from "./registrosPerfiles.js";
 

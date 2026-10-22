@@ -16,38 +16,6 @@ export abstract class AbstractConsultaImpresora {
         this.oids = oids;
     }
 
-
-    /**
-     * Obtiene el modelo de la impresora mediante SNMP.
-     *
-     * Es necesario conocer el modelo antes de generar los OID
-     * específicos de cada fabricante/modelo.
-     */
-    public async getModelo(): Promise<string> {
-
-        const session = crearSesion(this.impresora);
-
-
-        try {
-
-            const varbinds = await snmpGet(session, [this.oids.oidModelo]);
-
-            if (varbinds.length === 0 || !varbinds[0]) {
-                return "";
-            }
-
-            const varbind = varbinds[0];
-
-            this.impresora.modelo = varbind.value?.toString() ?? "";
-
-            return this.impresora.modelo;
-
-        } finally {
-            session.close();
-        }
-
-    }
-
     protected setNumeroSerie(resultados: Map<string, string | number>) {
 
         this.impresora.numeroDeSerie = resultados.get(this.oids.oidNumeroDeSerie)?.toString() ?? '';
@@ -55,13 +23,12 @@ export abstract class AbstractConsultaImpresora {
     }
 
     /**
-     * Obtiene el modelo de la impresora mediante SNMP.
+     *
      *
      * Es necesario conocer el modelo antes de generar los OID
      * específicos de cada fabricante/modelo.
      */
     private async obtenerDatosV2c(listaOids: string[]): Promise<snmp.Varbind[]> {
-
 
         const session = crearSesion(this.impresora);
 

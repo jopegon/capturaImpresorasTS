@@ -28,10 +28,6 @@ export class Impresora implements IImpresora {
   }
 
 
-
-  // --- MÉTODOS DE LÓGICA Y UTILIDAD ---
-
-  // Impresión en cadena formateada (Actualizada para leer las nuevas propiedades)
   public toString(): string {
     let cadena = `Modelo: ${this.modelo} s/n ${this.numeroDeSerie} snmp: ${this.versionSnmp} IP: ${this.ip} Localización: ${this.localizacion} Contador: ${this.contador} ContadorFotocopias: ${this.contadorFotocopias} Observaciones: ${this.observaciones} Tinta Negra: ${this.negro} %  Color: ${this.color} Conectada: ${this.conectada} Tinta Magenta: ${this.magenta} % Tinta Cyan: ${this.cyan} % Tinta Amarilla: ${this.amarillo} %`;
 

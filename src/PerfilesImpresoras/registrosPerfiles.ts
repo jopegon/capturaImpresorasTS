@@ -17,7 +17,6 @@ import { OidsL6910 } from "../Oids/OidsEspecificos/OidsL6910DN.js";
 import { OidsM201dw } from "../Oids/OidsEspecificos/OidsM201dw.js";
 import { OidsMXB427PW } from "../Oids/OidsEspecificos/OidsMXB427PW.js";
 import { OidsGenericos } from "../Oids/OidsEspecificos/OidsGenericos.js";
-import type { ConfigSnmp } from "../sessionSnmp/sesionSnmp.js";
 
 
 export type TPerfilImpresora = {

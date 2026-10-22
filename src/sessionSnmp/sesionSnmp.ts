@@ -14,8 +14,8 @@ export interface ConfigSnmp {
 export const CONFIG_SNMP: Readonly<ConfigSnmp> = {
     community: process.env["SNMP_COMMUNITY"] ?? "public",
     port: 161,
-    retries: 1,
-    timeout: 200,
+    retries: 2,
+    timeout: 500,
 };
 
 export function crearSesion(
@@ -42,7 +42,6 @@ export async function snmpGet(session: snmp.Session, oids: string[]): Promise<sn
 
             if (error) {
                 reject(error instanceof Error ? error : new Error(String(error)));
-                //reject(varbinds ?? [])
                 return;
             }
 
