@@ -14,12 +14,13 @@ async function consulta(impresora: Impresora): Promise<Impresora> {
         }
         //console.log(` ${impresora.toString()} `)
     } catch {
-
+        return impresora
     }
     return impresora
 }
 
 const impresoras: Impresora[] = [
+    new Impresora('192.168.1.136','epson'),
     new Impresora('10.41.81.217', 'Pasillo (secretaría)'),
     new Impresora('10.41.113.232', 'Pasillo (secretaría)'),
     new Impresora('10.41.81.219', 'Pasillo (secretaría)'),

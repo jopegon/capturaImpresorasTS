@@ -1,27 +1,26 @@
 import * as snmp from "net-snmp";
 import type { Impresora } from "./Impresora.js";
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
-import { crearSesion, snmpGet } from "../sessionSnmp/sesionSnmp.js";
 import { OidsGenericos } from "../Oids/OidsEspecificos/OidsGenericos.js";
+import { SessionSnmp } from "../sessionSnmp/SessionSnmp.js";
 
 export class IdentificadorImpresora {
 
-
     protected oids: IOidsIniciales;
 
-
-
     protected impresora: Impresora;
+
+    protected construirSesion: SessionSnmp;
 
     constructor(impresora: Impresora) {
         this.impresora = impresora;
 
+        this.construirSesion = new SessionSnmp();
 
         // Inicialmente desconocemos el modelo de impresora.
         // Estos OID permiten realizar la identificación inicial.
         this.oids = new OidsGenericos();
     }
-
 
 
     /**
@@ -30,13 +29,15 @@ export class IdentificadorImpresora {
  * Es necesario conocer el modelo antes de generar los OID
  * específicos de cada fabricante/modelo.
  */
-protected async getModelo(version: typeof snmp.Version1 | typeof snmp.Version2c): Promise<string> {
-    const session = crearSesion(this.impresora, version);
+    protected async getModelo(version: typeof snmp.Version1 | typeof snmp.Version2c): Promise<string> {
+
+
+        const session = this.construirSesion.crearSesion(this.impresora, version);
 
 
         try {
 
-            const varbinds = await snmpGet(session, [this.oids.oidModelo]);
+            const varbinds = await this.construirSesion.snmpGet(session, [this.oids.oidModelo]);
 
             if (varbinds.length === 0 || !varbinds[0]) {
                 return "";

@@ -1,7 +1,7 @@
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
+import { SessionSnmp } from "../sessionSnmp/SessionSnmp.js";
 import type { Impresora } from "./Impresora.js";
 import * as snmp from "net-snmp";
-import { crearSesion, snmpGet } from "../sessionSnmp/sesionSnmp.js";
 
 export type ValorContador = number | string | undefined;
 
@@ -11,15 +11,18 @@ export abstract class AbstractConsultaImpresora {
 
     protected oids: IOidsIniciales;
 
+    construirSesion: SessionSnmp;
+
     constructor(impresora: Impresora, oids: IOidsIniciales) {
         this.impresora = impresora;
         this.oids = oids;
+
+        this.construirSesion = new SessionSnmp();
     }
 
-    protected setNumeroSerie(resultados: Map<string, string | number>) {
-
-        this.impresora.numeroDeSerie = resultados.get(this.oids.oidNumeroDeSerie)?.toString() ?? '';
-
+    protected setNumeroSerie(r: Map<string, string | number | Buffer>) {
+        const v = r.get(this.oids.oidNumeroDeSerie);
+        this.impresora.numeroDeSerie = Buffer.isBuffer(v) ? v.toString("utf8") : (v?.toString() ?? "");
     }
 
     /**
@@ -30,10 +33,11 @@ export abstract class AbstractConsultaImpresora {
      */
     private async obtenerDatosV2c(listaOids: string[]): Promise<snmp.Varbind[]> {
 
-        const session = crearSesion(this.impresora);
+        let creaSesion = new SessionSnmp();
+        const session = creaSesion.crearSesion(this.impresora);
 
         try {
-            return await snmpGet(session, listaOids);;
+            return await creaSesion.snmpGet(session, listaOids);;
 
         } finally {
             session.close();
@@ -49,12 +53,13 @@ export abstract class AbstractConsultaImpresora {
      */
     private async obtenerDatosV1(listaOids: string[]): Promise<snmp.Varbind[]> {
 
-        const session = crearSesion(this.impresora);
+        let creaSesion = new SessionSnmp();
+        const session = creaSesion.crearSesion(this.impresora);
         try {
 
             // Primero intentamos obtener todos los OID
             // en una única petición.
-            return await snmpGet(session, listaOids);
+            return await creaSesion.snmpGet(session, listaOids);
 
         } catch (error) {
 
@@ -66,7 +71,7 @@ export abstract class AbstractConsultaImpresora {
 
                 try {
 
-                    const varbinds = await snmpGet(session, [oid]);
+                    const varbinds = await creaSesion.snmpGet(session, [oid]);
 
                     if (varbinds.length > 0) {
                         resultados.push(...varbinds);
