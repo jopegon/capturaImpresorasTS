@@ -10,11 +10,8 @@ export class IdentificadorImpresora {
 
     protected construirSesion: SessionSnmp;
 
-    protected impresora:Impresora;
 
     constructor( timeout?:number, retries?:number) {
-
-        this.impresora=new Impresora('','');
         
 
         this.construirSesion = new SessionSnmp();
@@ -57,7 +54,7 @@ export class IdentificadorImpresora {
 
             impresora.modelo = varbind.value?.toString() ?? "";
 
-            return this.impresora.modelo;
+            return impresora.modelo;
 
         } finally {
             session.close();
@@ -68,16 +65,12 @@ export class IdentificadorImpresora {
 
     public async identificar(impresora:Impresora): Promise<Impresora> {
 
-        const versiones = [snmp.Version2c, snmp.Version1];
-
-        this.impresora=impresora;
-
-        for (const version of versiones) {
+        for (const version of [snmp.Version2c, snmp.Version1]) {
             try {
                 await this.getModelo(impresora,version);
-                if (this.impresora.modelo.length > 0) {
-                    this.impresora.conectada = true;
-                    this.impresora.versionSnmp = version;
+                if (impresora.modelo.length > 0) {
+                    impresora.conectada = true;
+                    impresora.versionSnmp = version;
                     break;
                 }
             } catch {
@@ -86,6 +79,6 @@ export class IdentificadorImpresora {
 
         }
 
-        return this.impresora;
+        return impresora;
     }
 }

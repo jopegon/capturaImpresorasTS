@@ -32,6 +32,8 @@ if (resultado[0].status === "fulfilled") {
 } else {
     console.log(resultado[0].reason.value);
 }
+
+
 /*
 const resultado2 = await Promise.allSettled([new ServicioCaptura().capturaListaImpresoras(listaImpresoras)]);
 
@@ -46,6 +48,7 @@ for (const resultado of resultado2) {
 */
 
 const servicio = new ServicioCaptura();
+
 
 const resultados = await servicio.capturaListaImpresoras(listaImpresoras);
 for (const impresora of resultados) {

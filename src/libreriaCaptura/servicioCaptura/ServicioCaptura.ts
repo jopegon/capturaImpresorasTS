@@ -4,28 +4,35 @@ import { OperacionesPerfiles } from "../PerfilesImpresoras/OperacionesPerfiles.j
 
 export class ServicioCaptura {
 
-    timeout:number=500;
-    retries:number=1;
-    identificadorImpresora:IdentificadorImpresora;
-    constructor(timeout?:number, retries?:number){
+
+    private identificadorImpresora:IdentificadorImpresora;
+    private operacionesPerfiles:OperacionesPerfiles;
+/*
+    propiedades de parámetros (Parameter Properties) combinada con valores por defecto.
+
+    En lugar de declarar las propiedades explícitamente al inicio de la clase y luego escribir this.timeout = timeout dentro del constructor, TypeScript automatiza todo ese proceso en una sola línea.
+*/
+    constructor(private readonly timeout = 500, private readonly retries = 1){
         if (timeout){
            this.timeout=timeout; 
         }
-        if(retries){
+        if(retries!== undefined){
             this.retries=retries;
         }
         this.identificadorImpresora=new IdentificadorImpresora(this.timeout,this.retries);
+        this.operacionesPerfiles=new OperacionesPerfiles();
         
     }
 
     public async capturaImpresora(impresora: Impresora): Promise<Impresora> {
         try {
-            const identificada = await new IdentificadorImpresora(this.timeout, this.retries).identificar(impresora);
+            const identificada = await this.identificadorImpresora.identificar(impresora);
             if (!identificada.conectada) {
                 return identificada;
             }
-            const consulta = new OperacionesPerfiles().getConsulta(identificada);
+            const consulta = this.operacionesPerfiles.getConsulta(identificada);
             consulta.timeout=this.timeout;
+            consulta.retries=this.retries;
             return await consulta.getDatos();
         } catch (error) {
             return impresora;
@@ -33,7 +40,7 @@ export class ServicioCaptura {
     }
 
     // capturaImpresora nunca rechaza, así que Promise.all es seguro
-    public async capturaListaImpresoras(lista: Impresora[]): Promise<Impresora[]> {
+    public capturaListaImpresoras(lista: Impresora[]): Promise<Impresora[]> {
         return Promise.all(lista.map(i => this.capturaImpresora(i)));
     }
 }
