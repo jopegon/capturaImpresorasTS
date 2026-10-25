@@ -1,26 +1,11 @@
-import type { AbstractConsultaImpresora } from "./Impresoras/AbstractConsultaImpresora.js";
-import { IdentificadorImpresora } from "./Impresoras/IdentificadorImpresora.js";
-import { Impresora } from "./Impresoras/Impresora.js";
-import { OperacionesPerfiles } from "./PerfilesImpresoras/OperacionesPerfiles.js";
 
-async function consulta(impresora: Impresora): Promise<Impresora> {
+import { Impresora } from "./libreriaCaptura/Impresoras/Impresora.js";
+import { ServicioCaptura } from "./libreriaCaptura/servicioCaptura/ServicioCaptura.js";
 
-    try {
-        impresora = await new IdentificadorImpresora(impresora).identificar();
 
-        if (impresora.conectada) {
-            let consulta: AbstractConsultaImpresora = new OperacionesPerfiles().getConsulta(impresora);
-            impresora = await consulta.getDatos();
-        }
-        //console.log(` ${impresora.toString()} `)
-    } catch {
-        return impresora
-    }
-    return impresora
-}
 
-const impresoras: Impresora[] = [
-    new Impresora('192.168.1.136','epson'),
+const listaImpresoras: Impresora[] = [
+    new Impresora('192.168.1.136', 'epson'),
     new Impresora('10.41.81.217', 'Pasillo (secretaría)'),
     new Impresora('10.41.113.232', 'Pasillo (secretaría)'),
     new Impresora('10.41.81.219', 'Pasillo (secretaría)'),
@@ -39,16 +24,30 @@ const impresoras: Impresora[] = [
     new Impresora('10.41.81.227', 'Pasillo (secretaría)')
 ];
 
-const resultados = await Promise.allSettled(
-    impresoras.map(impresora => consulta(impresora))
-);
 
+const resultado = await Promise.allSettled([new ServicioCaptura().capturaImpresora(new Impresora('192.168.1.136', 'epson'))]);
 
-resultados.forEach((resultado) => {
-    if (resultado && resultado.status === 'fulfilled') {
-        console.log(`${resultado.value.toString()}`);
+if (resultado[0].status === "fulfilled") {
+    console.log(resultado[0].value.toString());
+} else {
+    console.log(resultado[0].reason.value);
+}
+/*
+const resultado2 = await Promise.allSettled([new ServicioCaptura().capturaListaImpresoras(listaImpresoras)]);
+
+for (const resultado of resultado2) {
+    if (resultado.status === "fulfilled") {
+        console.log(resultado.value.toString());
     } else {
-        const error = resultado ? resultado.reason : 'No se obtuvo respuesta';
-        console.error(` Error en :`, error);
+        console.log(resultado.reason.value);
     }
-})
+
+}
+*/
+
+const servicio = new ServicioCaptura();
+
+const resultados = await servicio.capturaListaImpresoras(listaImpresoras);
+for (const impresora of resultados) {
+    console.log(impresora.toString());
+}

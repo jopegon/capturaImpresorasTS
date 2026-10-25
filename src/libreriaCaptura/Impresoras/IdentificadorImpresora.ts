@@ -1,5 +1,5 @@
 import * as snmp from "net-snmp";
-import type { Impresora } from "./Impresora.js";
+import { Impresora } from "./Impresora.js";
 import type { IOidsIniciales } from "../Oids/IOidsIniciales.js";
 import { OidsGenericos } from "../Oids/OidsEspecificos/OidsGenericos.js";
 import { SessionSnmp } from "../sessionSnmp/SessionSnmp.js";
@@ -8,14 +8,24 @@ export class IdentificadorImpresora {
 
     protected oids: IOidsIniciales;
 
-    protected impresora: Impresora;
-
     protected construirSesion: SessionSnmp;
 
-    constructor(impresora: Impresora) {
-        this.impresora = impresora;
+    protected impresora:Impresora;
+
+    constructor( timeout?:number, retries?:number) {
+
+        this.impresora=new Impresora('','');
+        
 
         this.construirSesion = new SessionSnmp();
+
+        if(timeout){
+            this.construirSesion.CONFIG_SNMP.timeout=timeout;
+        }
+
+        if(retries){
+            this.construirSesion.CONFIG_SNMP.retries=retries;
+        }
 
         // Inicialmente desconocemos el modelo de impresora.
         // Estos OID permiten realizar la identificación inicial.
@@ -29,10 +39,10 @@ export class IdentificadorImpresora {
  * Es necesario conocer el modelo antes de generar los OID
  * específicos de cada fabricante/modelo.
  */
-    protected async getModelo(version: typeof snmp.Version1 | typeof snmp.Version2c): Promise<string> {
+    protected async getModelo(impresora:Impresora, version: typeof snmp.Version1 | typeof snmp.Version2c): Promise<string> {
 
 
-        const session = this.construirSesion.crearSesion(this.impresora, version);
+        const session = this.construirSesion.crearSesion(impresora, version);
 
 
         try {
@@ -45,7 +55,7 @@ export class IdentificadorImpresora {
 
             const varbind = varbinds[0];
 
-            this.impresora.modelo = varbind.value?.toString() ?? "";
+            impresora.modelo = varbind.value?.toString() ?? "";
 
             return this.impresora.modelo;
 
@@ -56,13 +66,15 @@ export class IdentificadorImpresora {
     }
 
 
-    public async identificar(): Promise<Impresora> {
+    public async identificar(impresora:Impresora): Promise<Impresora> {
 
         const versiones = [snmp.Version2c, snmp.Version1];
 
+        this.impresora=impresora;
+
         for (const version of versiones) {
             try {
-                await this.getModelo(version);
+                await this.getModelo(impresora,version);
                 if (this.impresora.modelo.length > 0) {
                     this.impresora.conectada = true;
                     this.impresora.versionSnmp = version;
