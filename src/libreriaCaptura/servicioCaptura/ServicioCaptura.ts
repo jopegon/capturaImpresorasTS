@@ -26,6 +26,7 @@ export class ServicioCaptura {
 
     public async capturaImpresora(impresora: Impresora): Promise<Impresora> {
         try {
+            impresora.conectada=false;
             const identificada = await this.identificadorImpresora.identificar(impresora);
             if (!identificada.conectada) {
                 return identificada;

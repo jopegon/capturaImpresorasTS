@@ -25,20 +25,20 @@ export abstract class AbstractConsultaImpresora {
         this.construirSesion = new SessionSnmp();
 
         if (timeout) {
-            this.construirSesion.CONFIG_SNMP.timeout = timeout;
+            this.construirSesion.configSnmp.timeout = timeout;
         }
 
-        if (retries) {
-            this.construirSesion.CONFIG_SNMP.retries = retries;
+        if (retries !== undefined) {
+            this.construirSesion.configSnmp.retries = retries;
         }
 
     }
     public set timeout(timeout: number) {
-        this.construirSesion.CONFIG_SNMP.timeout = timeout;
+        this.construirSesion.configSnmp.timeout = timeout;
     }
 
     public set retries(retries: number) {
-        this.construirSesion.CONFIG_SNMP.retries = retries;
+        this.construirSesion.configSnmp.retries = retries;
     }
 
     protected setNumeroSerie(r: Map<string, ValorSnmp>) {
@@ -125,22 +125,41 @@ export abstract class AbstractConsultaImpresora {
 
     protected calcularPorcentaje(capacidadRaw: ValorContador,
         nivelRaw: ValorContador): number | undefined {
+          
+
+        if (nivelRaw === -3 ||nivelRaw === -2 || nivelRaw===-1) {              
+            return undefined;
+        }
+    
         if (capacidadRaw === undefined || nivelRaw === undefined) {
             return undefined;
         }
 
-        const capacidad = Number(capacidadRaw);
-        const nivel = Number(nivelRaw);
+        let capacidad: number=0;
+        let nivel: number=0;
+
+        try {
+            capacidad = Number(capacidadRaw);
+            nivel = Number(nivelRaw);
+        }
+        catch {                    
+            return undefined
+        }
 
         if (
             !Number.isFinite(capacidad) ||
             !Number.isFinite(nivel) ||
-            capacidad <= 0
+            capacidad < 0
         ) {
             return undefined;
         }
 
-        return Math.round((nivel / capacidad) * 100);
+        let resultado=Math.round((nivel / capacidad) * 100);
+
+        if (resultado>100)
+            return undefined
+        else
+            return resultado;
     }
 
 

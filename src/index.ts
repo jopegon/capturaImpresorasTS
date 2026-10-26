@@ -1,7 +1,7 @@
 
 import { Impresora } from "./libreriaCaptura/Impresoras/Impresora.js";
 import { ServicioCaptura } from "./libreriaCaptura/servicioCaptura/ServicioCaptura.js";
-
+    
 
 
 const listaImpresoras: Impresora[] = [
@@ -32,20 +32,6 @@ if (resultado[0].status === "fulfilled") {
 } else {
     console.log(resultado[0].reason.value);
 }
-
-
-/*
-const resultado2 = await Promise.allSettled([new ServicioCaptura().capturaListaImpresoras(listaImpresoras)]);
-
-for (const resultado of resultado2) {
-    if (resultado.status === "fulfilled") {
-        console.log(resultado.value.toString());
-    } else {
-        console.log(resultado.reason.value);
-    }
-
-}
-*/
 
 const servicio = new ServicioCaptura();
 

@@ -13,12 +13,25 @@ export class ConsultaBizhub5020i extends AbstractConsultaImpresora {
 
     protected setNivelNegro(resultados: Map<string, string | number>) {
 
-        let nivel:string|number|undefined;
+        let nivel: string | number | undefined;
         nivel = resultados.get(this.oids.oidTonerLevelNegro);
 
         if (nivel === undefined) {
-            return;
+            return undefined;
         }
+
+        if (nivel === -3 || nivel === -2 || nivel === -1) {
+            return undefined;
+        }
+
+        if (typeof nivel === "number") {
+            if (nivel > 100) {
+                return undefined
+            }
+        }else{
+            return undefined;
+        }
+    
 
         this.impresora.negro = +nivel;
     }

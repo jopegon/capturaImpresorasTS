@@ -1,41 +1,35 @@
 import type { IImpresora } from "../Impresoras/IImpresora.js";
 
 import * as snmp from "net-snmp";
+import { ConfigSnmp } from "./ConfigSnmp.js";
 
 export type VersionSnmp = typeof snmp.Version1 | typeof snmp.Version2c;
 
-export interface ConfigSnmp {
-    community: string;
-    port: number;
-    retries: number;
-    timeout: number;
-}
 
 
 export class SessionSnmp {
 
-    CONFIG_SNMP: ConfigSnmp = {
-        community: process.env["SNMP_COMMUNITY"] ?? "public",
-        port: 161,
-        retries: 2,
-        timeout: 500,
-    };
+    configSnmp:ConfigSnmp;
+
+    constructor(){
+        this.configSnmp=new ConfigSnmp();
+    }
 
     setTimeOut(timeout:number){
-        this.CONFIG_SNMP.timeout=timeout;
+        this.configSnmp.timeout=timeout;
     }
     
     setRetries(retries:number){
-        this.CONFIG_SNMP.retries=retries
+        this.configSnmp.retries=retries
     }
 
     setPort(port:number){
-        this.CONFIG_SNMP.port=port;
+        this.configSnmp.port=port;
     }
 
 
     crearSesion(impresora: IImpresora, version: VersionSnmp = impresora.versionSnmp,
-        config: Readonly<ConfigSnmp> = this.CONFIG_SNMP,): snmp.Session {
+        config: Readonly<ConfigSnmp> = this.configSnmp,): snmp.Session {
 
         const { community, ...opciones } = config;
         return snmp.createSession(impresora.ip, community, { ...opciones, version });

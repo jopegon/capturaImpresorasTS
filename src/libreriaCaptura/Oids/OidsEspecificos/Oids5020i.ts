@@ -6,10 +6,11 @@ export class Oids5020i extends OidsGenericos {
 
     constructor() {
         super();
-        this.oidTonerLevelNegro = '1.3.6.1.4.1.18334.1.1.1.5.7.4.4.1.3.1';
-        this.oidFullCapacityNegro = '1.3.6.1.4.1.18334.1.1.1.5.7.4.4.1.3.1';
-                this.listaOids = [this.oidNumeroDeSerie, this.oidContadorImpresiones, this.oidTonerLevelNegro,
-                this.oidFullCapacityNegro];
+
+        // esta impresora tiene una consulta especial no necesita fullCapacity
+        this.oidTonerLevelNegro =   '1.3.6.1.4.1.18334.1.1.1.5.7.4.4.1.3.1';
+        
+        this.listaOids = [this.oidNumeroDeSerie, this.oidContadorImpresiones, this.oidTonerLevelNegro];
     }
 }
 

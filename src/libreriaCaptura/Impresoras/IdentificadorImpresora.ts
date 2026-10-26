@@ -17,11 +17,11 @@ export class IdentificadorImpresora {
         this.construirSesion = new SessionSnmp();
 
         if(timeout){
-            this.construirSesion.CONFIG_SNMP.timeout=timeout;
+            this.construirSesion.configSnmp.timeout=timeout;
         }
 
-        if(retries){
-            this.construirSesion.CONFIG_SNMP.retries=retries;
+        if(retries!== undefined){
+            this.construirSesion.configSnmp.retries=retries;
         }
 
         // Inicialmente desconocemos el modelo de impresora.
@@ -65,6 +65,7 @@ export class IdentificadorImpresora {
 
     public async identificar(impresora:Impresora): Promise<Impresora> {
 
+        impresora.inicializaValores();
         for (const version of [snmp.Version2c, snmp.Version1]) {
             try {
                 await this.getModelo(impresora,version);
