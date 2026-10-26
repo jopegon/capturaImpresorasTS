@@ -25,18 +25,7 @@ const listaImpresoras: Impresora[] = [
 ];
 
 
-const resultado = await Promise.allSettled([new ServicioCaptura().capturaImpresora(new Impresora('192.168.1.136', 'epson'))]);
-
-if (resultado[0].status === "fulfilled") {
-    console.log(resultado[0].value.toString());
-} else {
-    console.log(resultado[0].reason.value);
-}
-
-const servicio = new ServicioCaptura();
-
-
-const resultados = await servicio.capturaListaImpresoras(listaImpresoras);
+const resultados = await new ServicioCaptura().capturaListaImpresoras(listaImpresoras);
 for (const impresora of resultados) {
     console.log(impresora.toString());
 }
