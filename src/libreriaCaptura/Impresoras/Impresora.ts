@@ -21,6 +21,8 @@ export class Impresora implements IImpresora {
   contador: number = 0;
   contadorFotocopias: number = 0;
 
+  error: string | undefined = undefined;
+
 
   constructor(ip: string, localizacion?: string) {
     this.ip = ip;
@@ -30,6 +32,7 @@ export class Impresora implements IImpresora {
   public inicializaValores():Impresora{
     this.conectada=false;
     this.modelo="";
+    this.versionSnmp=snmp.Version2c;
     this.numeroDeSerie="";
     this.color=false;
     this.negro=undefined;
@@ -37,12 +40,18 @@ export class Impresora implements IImpresora {
     this.cyan=undefined;
     this.magenta=undefined;
     this.contador=0;
+    this.contadorFotocopias=0;
+    this.error=undefined;
     return this;
   }
 
   public toString(): string {
     let cadena = `Modelo: ${this.modelo} s/n ${this.numeroDeSerie} snmp: ${this.versionSnmp} IP: ${this.ip} Localización: ${this.localizacion} Contador: ${this.contador} ContadorFotocopias: ${this.contadorFotocopias} Observaciones: ${this.observaciones} Tinta Negra: ${this.negro} %  Color: ${this.color} Conectada: ${this.conectada} Tinta Magenta: ${this.magenta} % Tinta Cyan: ${this.cyan} % Tinta Amarilla: ${this.amarillo} %`;
 
-    return cadena + ` \n`;
+   if (this.error !== undefined) {
+      cadena += ` Error: ${this.error}`;
+    }
+
+     return cadena + ` \n`;
   }
 }

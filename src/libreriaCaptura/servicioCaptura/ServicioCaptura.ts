@@ -13,12 +13,6 @@ export class ServicioCaptura {
     En lugar de declarar las propiedades explícitamente al inicio de la clase y luego escribir this.timeout = timeout dentro del constructor, TypeScript automatiza todo ese proceso en una sola línea.
 */
     constructor(private readonly timeout = 500, private readonly retries = 1){
-        if (timeout){
-           this.timeout=timeout; 
-        }
-        if(retries!== undefined){
-            this.retries=retries;
-        }
         this.identificadorImpresora=new IdentificadorImpresora(this.timeout,this.retries);
         this.operacionesPerfiles=new OperacionesPerfiles();
         
@@ -31,11 +25,13 @@ export class ServicioCaptura {
             if (!identificada.conectada) {
                 return identificada;
             }
+ 
             const consulta = this.operacionesPerfiles.getConsulta(identificada);
             consulta.timeout=this.timeout;
             consulta.retries=this.retries;
             return await consulta.getDatos();
         } catch (error) {
+            impresora.error = error instanceof Error ? error.message : String(error);
             return impresora;
         }
     }

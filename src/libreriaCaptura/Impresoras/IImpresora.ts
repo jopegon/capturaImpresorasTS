@@ -23,6 +23,7 @@ export interface IImpresora {
   contador: number;
   contadorFotocopias: number;
 
+  error: string | undefined;
   // Métodos de comportamiento
   toString(): string;
 }

@@ -4,6 +4,7 @@ import * as snmp from "net-snmp";
 import { Impresora } from "../src/libreriaCaptura/Impresoras/Impresora.js";
 import { ServicioCaptura } from "../src/libreriaCaptura/servicioCaptura/ServicioCaptura.js";
 import { conSimulador, RedSimulada, SUMINISTROS_COLOR, type Suministro } from "./simuladorImpresora.js";
+import { OperacionesPerfiles } from "../src/libreriaCaptura/PerfilesImpresoras/OperacionesPerfiles.js";
 
 /**
  * Pruebas de extremo a extremo: identificación → perfil → consulta → datos,
@@ -188,6 +189,22 @@ describe("ServicioCaptura (impresora simulada)", () => {
             });
         });
     });
+
+
+
+
+    describe("fallos inesperados (no son impresoras apagadas)", () => {
+
+
+        it("una impresora apagada no es un fallo: conectada false y sin error", async () => {
+            const impresora = await new ServicioCaptura(150, 0).capturaImpresora(new Impresora("10.0.5.99"));
+
+            assert.equal(impresora.conectada, false);
+            assert.equal(impresora.error, undefined);
+        });
+    });
+
+
 
     describe("tiempos de espera", () => {
 

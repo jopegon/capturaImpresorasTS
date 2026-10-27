@@ -138,18 +138,13 @@ export abstract class AbstractConsultaImpresora {
         let capacidad: number=0;
         let nivel: number=0;
 
-        try {
-            capacidad = Number(capacidadRaw);
-            nivel = Number(nivelRaw);
-        }
-        catch {                    
-            return undefined
-        }
+        capacidad = Number(capacidadRaw);
+        nivel = Number(nivelRaw);
 
         if (
             !Number.isFinite(capacidad) ||
             !Number.isFinite(nivel) ||
-            capacidad < 0
+            capacidad <= 0 || nivel <0
         ) {
             return undefined;
         }
@@ -261,10 +256,13 @@ export abstract class AbstractConsultaImpresora {
                 this.impresora.color = true;
             }
         } catch (error) {
+            this.impresora.error=(error as Error).message;
             console.warn(`No se pudieron obtener niveles de ${this.impresora.ip}:`, (error as Error).message);
         }
-
-        return this.impresora;
+        finally{
+           return this.impresora; 
+        }
+        
     }
 
 
